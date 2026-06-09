@@ -80,7 +80,9 @@ Dev (in the `dev` dependency group, installed by `uv sync`):
 
 ## License
 
-The code in this repo is MIT-licensed (see [`LICENSE`](LICENSE)). Rendering
-relies on Highcharts JS (loaded from the CDN) and the Highcharts export server,
-which are subject to Highcharts' own licensing — free for non-commercial use;
-commercial use requires a Highcharts license.
+No license is granted for this project — all rights reserved. With no license,
+the default of copyright law applies: you may view the code here, but you may
+not use, copy, modify, or distribute it without the author's permission.
+Rendering relies on Highcharts JS (loaded from the CDN) and the Highcharts
+export server, which are subject to Highcharts' own licensing — free for
+non-commercial use; commercial use requires a Highcharts license.

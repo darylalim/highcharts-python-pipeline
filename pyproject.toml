@@ -6,7 +6,6 @@ build-backend = "hatchling.build"
 name = "highcharts-python-pipeline"
 version = "0.1.0"
 description = "Generate data visualizations with the Highcharts for Python Toolkit."
-license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
     "highcharts-core>=1.10.3",
