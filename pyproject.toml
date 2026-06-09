@@ -27,19 +27,12 @@ dev = [
 bypass-selection = true
 
 [tool.ruff.lint]
-# E/F/W catch real bugs and are clean today; I/UP/SIM are zero-finding ratchets
-# that keep imports sorted, syntax modern (py312, auto-inferred from
-# requires-python), and code un-convoluted; B (bugbear) is the only family with
-# findings (zip without strict=). Deliberately NOT "ALL" — that pulls in rules
-# that fight this app's design (lazy imports, pytest asserts, no __init__.py,
-# intentional unicode in UI strings).
+# Balanced set, not "ALL" (which fights this app's deliberate design).
+# E501 is ignored: the formatter owns line length. target-version auto-infers
+# py312 from requires-python.
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
-# The formatter owns code line length. The only line ruff format can't shorten
-# is an un-splittable CSS string inside an f-string literal, so E501 here would
-# be pure noise.
 ignore = ["E501"]
 
 [tool.ruff.format]
-# Defaults are correct for this project (line length 88, double quotes, magic
-# trailing commas). This table makes the formatter explicitly opted in so CI
-# can gate on `ruff format --check`.
+# Defaults are correct (line length 88, double quotes). Table kept as an
+# explicit anchor for any future formatter settings.

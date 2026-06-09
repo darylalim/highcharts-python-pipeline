@@ -75,6 +75,11 @@ uv tool install pre-commit && pre-commit install
 VS Code users get format-on-save and fix-on-save via the committed
 `.vscode/settings.json` (install the recommended Ruff extension).
 
+## CI
+
+GitHub Actions runs the tests and the Ruff lint/format checks on every push to
+`main` and every pull request (`.github/workflows/ci.yml`).
+
 ## Notes
 
 - There is **no official `streamlit-highcharts` integration** for the

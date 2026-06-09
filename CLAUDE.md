@@ -52,7 +52,8 @@ full app headless via Streamlit's `AppTest`.
 
 ## Lint & format
 
-Ruff handles both (config in `pyproject.toml`). CI gates on these.
+Ruff handles both (config in `pyproject.toml`). CI runs the tests and these
+checks on every push and PR; `pre-commit` runs them on commit when installed.
 
 ```bash
 uv run ruff check --fix . && uv run ruff format .   # fix + format
