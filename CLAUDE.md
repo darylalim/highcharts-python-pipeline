@@ -2,69 +2,59 @@
 
 ## Project Overview
 
-Jupyter notebook demos for the Highcharts for Python toolkit. Each `.ipynb` file is a self-contained example of a specific chart type.
+Generate data visualizations with the Highcharts for Python toolkit
+(`highcharts-core`). This repo is an interactive Streamlit app that builds those
+visualizations from pandas DataFrames; every chart is produced by Highcharts —
+the app uses no native Streamlit charts.
 
-## Architecture
+## Structure
 
-Notebooks are organized by Highcharts product, then by chart category:
+- `streamlit_app.py` — the Streamlit UI: data source (sample datasets or CSV
+  upload), chart-type/column controls, caching, render-mode toggle, and the
+  chart embed.
+- `highcharts_builder.py` — pure, Streamlit-free helpers that turn a DataFrame
+  into a Highcharts options `dict`, a `Chart`, and embeddable HTML or PNG bytes.
+  Independently importable and unit-testable.
+- `tests/test_smoke.py` — builder unit tests plus a headless `AppTest` run.
 
-- `highcharts-core/` — line, area, column/bar, pie, heat/tree maps, trees/networks, other
-- `highcharts-stock/` — candlestick, OHLC, HLC, heikin-ashi, and other financial charts
-- `highcharts-gantt/` — Gantt/project timeline charts
+## How a chart is built
 
-### Notebook structure
-
-Every notebook follows the same cell pattern — each step is an H2 markdown cell followed by a code cell:
-
-1. `# <Chart Name>` — title and one-line description
-2. `## Import Dependencies` — imports from the appropriate `highcharts_*` package
-3. `## Retrieve Data` (optional) — fetches external data via `requests`
-4. `## Prepare Data` (optional) — transforms fetched or inline data
-5. `## Configure Options` — chart config as either:
-   - `options_as_str` — JS literal string (many core demos)
-   - `options_as_dict` — Python dict (some core demos, all stock and gantt demos)
-6. `## Assemble Chart and Options` — creates the `Chart` object
-7. `## Render Visualization` — calls `chart.display()`
-
-Some notebooks add extra sections (e.g., `## Add Technical Indicators`, `## Add Series`) or combine assembly and render into `## Assemble and Display Chart`.
-
-### API patterns
-
-**highcharts-core** — imports from `highcharts_core.chart` and `highcharts_core.options`:
+`highcharts_builder.py` exposes the public helpers the app uses:
 
 ```python
-options = HighchartsOptions.from_js_literal(options_as_str)  # or .from_dict(options_as_dict)
-chart = Chart.from_options(options)
+# build_options() -> Chart.from_options() -> set container, in one call:
+chart = make_chart(df, chart_type, x_col, y_cols, title=title)
+
+# interactive: get_script_tags() + to_js_literal() wrapped as HTML for st.iframe
+html = build_chart_html(df, chart_type, x_col, y_cols, height=height, title=title)
+
+# static: rendered server-side to PNG bytes via the export server, for st.image
+png = build_chart_png(df, chart_type, x_col, y_cols, title=title)
 ```
 
-**highcharts-stock** — imports from `highcharts_stock.chart`; passes dict directly to `Chart.from_options()` without a `HighchartsOptions` intermediate:
+Supported chart types: `line`, `spline`, `area`, `column`, `bar`, `pie`,
+`scatter`.
 
-```python
-chart = Chart.from_options(options_as_dict)
-chart.is_stock_chart = True  # only when stock chart mode is explicitly needed
+## Run
+
+```bash
+uv run streamlit run streamlit_app.py
 ```
 
-**highcharts-gantt** — imports from `highcharts_gantt.chart`:
+## Test
 
-```python
-chart = Chart.from_options(options_as_dict, chart_kwargs={'is_gantt_chart': True})
+```bash
+uv run pytest
 ```
 
-**Technical indicators** (stock only) — returns the updated chart:
-
-```python
-chart = chart.options.series[0].add_indicator(chart, 'macd', indicator_kwargs={'y_axis': 1})
-```
-
-**Data fetching** (stock only) — passes raw JSON string as the series `data` value:
-
-```python
-stock_response = requests.get('https://demo-live-data.highcharts.com/aapl-ohlcv.json')
-stock_data = stock_response.text
-```
+`tests/test_smoke.py` exercises the pure builder (`build_options`) and runs the
+full app headless via Streamlit's `AppTest`.
 
 ## Conventions
 
-- Follow the existing notebook cell structure and markdown heading pattern
-- Place notebooks in the subfolder matching their Highcharts product and chart category
-- Notebook filenames use lowercase kebab-case (e.g., `spline-with-plot-bands.ipynb`)
+- Keep chart-building logic (DataFrame → Highcharts) in `highcharts_builder.py`,
+  free of Streamlit imports, so it stays unit-testable.
+- Render every visualization with Highcharts (`highcharts-core`); do not use
+  native Streamlit charts.
+- Use `EnforcedNull` (from `highcharts_core.constants`) for missing data points
+  in dict configs, not Python `None`.

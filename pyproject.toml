@@ -3,14 +3,25 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "highcharts-for-python-demos"
+name = "highcharts-python-pipeline"
 version = "0.1.0"
-description = "Jupyter notebook demos for the Highcharts for Python toolkit"
+description = "Generate data visualizations with the Highcharts for Python Toolkit."
+license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
     "highcharts-core>=1.10.3",
-    "highcharts-gantt>=1.7.0",
-    "highcharts-stock>=1.7.0",
-    "jupyterlab>=4.4.1",
-    "requests>=2.32.0",
+    "pandas>=2.2.0",
+    "streamlit>=1.56.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "watchdog>=6.0.0",
+]
+
+# This project ships a Streamlit app, not an importable package, so tell
+# Hatchling it's fine to build an empty wheel (otherwise `uv sync` fails
+# trying to determine which files to ship).
+[tool.hatch.build.targets.wheel]
+bypass-selection = true
